@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import Grid from '@material-ui/core/Grid';
@@ -23,7 +23,7 @@ interface BasicAuthInfo {
 
 const { requestErrorMsg } = defaultConsts;
 
-export default function LoginPage() {
+export default function login() {
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
   const [reqError, setreqError] = useState(false);
@@ -52,6 +52,8 @@ export default function LoginPage() {
 
     innerSubmit();
   };
+
+  useEffect(() => {}, []);
 
   return (
     <Container style={{ maxWidth: '480px' }}>

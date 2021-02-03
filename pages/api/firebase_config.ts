@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+// This information being exposed to the public does not make much difference i'm just leaving the process.envs mostly for deployment etc
 export default (_req: NextApiRequest, res: NextApiResponse) => {
   const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,

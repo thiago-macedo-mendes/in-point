@@ -13,9 +13,7 @@ export default function NavBar() {
       <AppBar position="sticky">
         <Toolbar>
           <NavMenu />
-          <Typography variant="h4" style={{ flexGrow: 1 }}>
-            {defaultConsts.appName}
-          </Typography>
+          <Typography variant="h4">{defaultConsts.appName}</Typography>
         </Toolbar>
       </AppBar>
     </div>

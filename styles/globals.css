@@ -21,11 +21,17 @@ a {
 
 .loading-div {
   display: flex;
-  min-height: 100vh;
+  min-height: 50vh;
   justify-content: center;
   align-items: center;
 }
 
 .loading-circle {
   min-width: 50px;
+}
+
+.center-all-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

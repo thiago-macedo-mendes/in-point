@@ -26,25 +26,24 @@ type appProps = PropTypes.InferProps<typeof proptypes>;
 const loggedInOnlyPaths = ['/feed'];
 const notLoggedInOnlyPaths = ['/login', '/signup'];
 
-function MyApp({ Component, pageProps }: appProps) {
+function App({ Component, pageProps }: appProps) {
   const [firebaseApp, setfirebaseApp] = useState<firebase.app.App | null>(null);
   const [currentUser, setcurrentUser] = useState<firebase.User | null>(null);
 
   const router = useRouter();
 
   const [isMainLoading, setIsMainLoading] = useState(true);
-  const [isComponentLoading, setisComponentLoading] = useState(true);
 
   useEffect(() => {
     axios
       .get('/api/firebase_config')
       .then((res) => res.data)
       .then((data) => {
-        try {
-          if (data) {
+        if (data) {
+          try {
             firebase.initializeApp(data);
-          }
-        } catch {}
+          } catch {}
+        }
 
         const firebase_app = firebase.app();
 
@@ -55,43 +54,25 @@ function MyApp({ Component, pageProps }: appProps) {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsMainLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setisComponentLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
     if (firebaseApp) {
-      const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      firebase.auth().onAuthStateChanged((user) => {
         setcurrentUser(user);
       });
-      return () => unsubscribe();
+      setTimeout(() => {
+        setIsMainLoading(false);
+      }, 1000);
     }
-  }, []);
+  }, [firebaseApp]);
 
   useEffect(() => {
     const { pathname } = router;
 
     if (currentUser && notLoggedInOnlyPaths.includes(pathname)) {
       router.push('/feed');
-    } else if (
-      !isMainLoading &&
-      !currentUser &&
-      loggedInOnlyPaths.includes(pathname)
-    ) {
+    } else if (!currentUser && loggedInOnlyPaths.includes(pathname)) {
       router.push('/login');
     }
-  }, [currentUser, isMainLoading]);
+  }, [currentUser]);
 
   return (
     <div id="main-div">
@@ -102,18 +83,10 @@ function MyApp({ Component, pageProps }: appProps) {
           </div>
         ) : (
           <Fragment>
-            {isComponentLoading ? (
-              <div className="loading-div">
-                <CircularProgress />
-              </div>
-            ) : (
-              <Fragment>
-                <NavBar />
-                <div id="root-main">
-                  <Component {...pageProps} />
-                </div>
-              </Fragment>
-            )}
+            <NavBar />
+            <div id="root-main">
+              <Component {...pageProps} />
+            </div>
           </Fragment>
         )}
       </CssBaseline>
@@ -121,6 +94,6 @@ function MyApp({ Component, pageProps }: appProps) {
   );
 }
 
-MyApp.propTypes = proptypes;
+App.propTypes = proptypes;
 
-export default MyApp;
+export default App;
