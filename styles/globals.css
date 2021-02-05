@@ -15,8 +15,8 @@ a {
   box-sizing: border-box;
 }
 
-#root-main {
-  padding: 25px;
+.padding-25-top {
+  padding-top: 25px;
 }
 
 .loading-div {
@@ -24,10 +24,6 @@ a {
   min-height: 50vh;
   justify-content: center;
   align-items: center;
-}
-
-.loading-circle {
-  min-width: 50px;
 }
 
 .center-all-div {

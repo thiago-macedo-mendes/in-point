@@ -43,22 +43,31 @@ export default function FormModal({ open, setOpen }: componentProps) {
     e.preventDefault();
 
     const currentUser = firebase.auth().currentUser;
-    
+
     if (currentUser) {
       const uid = currentUser.uid;
       const timestamp = new Date();
+      const likes = 0;
 
       firebase
         .firestore()
         .collection('POSTS')
-        .add({ uid, title, desc, imageURL, timestamp })
+        .add({ uid, title, desc, timestamp, likes })
         .then((docRef) => {
-          if (imageRaw && imageURL && imageRaw instanceof Blob) {
-            firebase
-              .storage()
-              .ref(`/POSTS/${docRef.id}/IMAGES/${imageRaw.name}`)
-              .put(imageRaw);
+          let imgname = 'null';
+          let toPut: Blob = new Blob(['null'], {
+            type: 'application/octet-stream'
+          });
+
+          if (imageRaw && imageURL) {
+            imgname = imageRaw.name;
+            toPut = imageRaw;
           }
+
+          firebase
+            .storage()
+            .ref(`/POSTS/${docRef.id}/IMAGES/${imgname}`)
+            .put(toPut);
         });
 
       handleClose();

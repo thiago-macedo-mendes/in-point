@@ -5,8 +5,10 @@ import { useRouter } from 'next/router';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
 
 import firebase from 'firebase/app';
+import 'firebase/auth';
 
 export default function NavMenu() {
   const currentUser = firebase.auth().currentUser;
@@ -39,7 +41,7 @@ export default function NavMenu() {
   return (
     <div>
       <IconButton edge="start" color="inherit" onClick={handleClick}>
-        <strong>☰</strong>
+        <MenuIcon />
         <Menu anchorEl={anchorEl} open={isAnchorElOpen} onClose={handleClose}>
           <div>
             {!currentUser ? (
