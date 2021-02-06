@@ -46,57 +46,74 @@ export default function feed({ currentUser }: props) {
     const storage = firebase.storage();
 
     const postsCollection = firestore.collection('POSTS');
-    postsCollection.onSnapshot((querySnapshot) => {
-      let postsArray: Array<post> = [];
-      querySnapshot.docs.forEach((doc) => {
-        const updateFeed = async () => {
-          const post_data = doc.data();
-
-          const { id } = doc;
-          const { uid, title, desc, likes, displayName, timestamp } = post_data;
-
-          let imgURL = 'null';
-
-          if (false) {
-            try {
-              const imageLists = await storage
-                .ref(`/POSTS/${id}/IMAGES`)
-                .list();
-              const mainIMG = imageLists.items[0];
-              imgURL = await mainIMG.getDownloadURL();
-            } catch {}
+    postsCollection.onSnapshot(
+      (querySnapshot) => {
+        let postsArray: Array<post> = [];
+        querySnapshot.docs.forEach((doc) => {
+          if (querySnapshot.empty) {
+            return null;
           }
 
-          let isValid = false;
+          const updateFeed = async () => {
+            const post_data = doc.data();
 
-          if (
-            id &&
-            uid &&
-            title &&
-            timestamp &&
-            desc &&
-            displayName &&
-            likes !== undefined
-          ) {
-            isValid = true;
-          }
-          postsArray.push({
-            id,
-            uid,
-            displayName,
-            title,
-            desc,
-            imgURL,
-            likes,
-            timestamp,
-            isValid
-          });
-        };
-        updateFeed();
-      });
-      postsArray = postsArray.filter((post) => post.isValid);
-      setcurrentPosts(postsArray);
-    });
+            const { id } = doc;
+
+            const {
+              uid,
+              title,
+              desc,
+              likes,
+              displayName,
+              timestamp
+            } = post_data;
+
+            let imgURL = 'null';
+
+            if (false) {
+              try {
+                const imageLists = await storage
+                  .ref(`/POSTS/${id}/IMAGES`)
+                  .list();
+                const mainIMG = imageLists.items[0];
+                imgURL = await mainIMG.getDownloadURL();
+              } catch {}
+            }
+
+            let isValid = false;
+
+            if (
+              id &&
+              uid &&
+              title &&
+              timestamp &&
+              desc &&
+              displayName &&
+              likes !== undefined
+            ) {
+              isValid = true;
+            }
+            postsArray.push({
+              id,
+              uid,
+              displayName,
+              title,
+              desc,
+              imgURL,
+              likes,
+              timestamp,
+              isValid
+            });
+          };
+          updateFeed();
+        });
+        postsArray = postsArray.filter((post) => post.isValid);
+        setcurrentPosts(postsArray);
+      },
+      (_err) => {
+        router.push('/login');
+      }
+    );
   };
 
   useEffect(() => {
