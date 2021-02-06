@@ -13,6 +13,7 @@ import FeedPosts from '../components/posts/FeedPosts';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/storage';
+import { Unsubscribe } from '@material-ui/icons';
 
 interface props {
   currentUser: firebase.User;
@@ -41,85 +42,93 @@ export default function feed({ currentUser }: props) {
     setformPostOpen(true);
   };
 
-  const fetchNewPosts = () => {
-    const firestore = firebase.firestore();
-    const storage = firebase.storage();
-
-    const postsCollection = firestore.collection('POSTS');
-    postsCollection.onSnapshot(
-      (querySnapshot) => {
-        let postsArray: Array<post> = [];
-        querySnapshot.docs.forEach((doc) => {
-          if (querySnapshot.empty) {
-            return null;
-          }
-
-          const updateFeed = async () => {
-            const post_data = doc.data();
-
-            const { id } = doc;
-
-            const {
-              uid,
-              title,
-              desc,
-              likes,
-              displayName,
-              timestamp
-            } = post_data;
-
-            let imgURL = 'null';
-
-            if (false) {
-              try {
-                const imageLists = await storage
-                  .ref(`/POSTS/${id}/IMAGES`)
-                  .list();
-                const mainIMG = imageLists.items[0];
-                imgURL = await mainIMG.getDownloadURL();
-              } catch {}
-            }
-
-            let isValid = false;
-
-            if (
-              id &&
-              uid &&
-              title &&
-              timestamp &&
-              desc &&
-              displayName &&
-              likes !== undefined
-            ) {
-              isValid = true;
-            }
-            postsArray.push({
-              id,
-              uid,
-              displayName,
-              title,
-              desc,
-              imgURL,
-              likes,
-              timestamp,
-              isValid
-            });
-          };
-          updateFeed();
-        });
-        postsArray = postsArray.filter((post) => post.isValid);
-        setcurrentPosts(postsArray);
-      },
-      (_err) => {
-        router.push('/login');
-      }
-    );
-  };
-
   useEffect(() => {
     if (currentUser) {
-      fetchNewPosts();
+      const firestore = firebase.firestore();
+      const storage = firebase.storage();
+
+      const postsCollection = firestore.collection('POSTS');
+      const unsubscribe = postsCollection.onSnapshot(
+        (querySnapshot) => {
+          let postsArray: Array<post> = [];
+          querySnapshot.docs.forEach((doc) => {
+            if (querySnapshot.empty) {
+              return null;
+            }
+
+            const updateFeed = async () => {
+              const post_data = doc.data();
+
+              const { id } = doc;
+
+              const {
+                uid,
+                title,
+                desc,
+                likes,
+                displayName,
+                timestamp
+              } = post_data;
+
+              let imgURL = 'null';
+
+              if (false) {
+                try {
+                  const imageLists = await storage
+                    .ref(`/POSTS/${id}/IMAGES`)
+                    .list();
+                  const mainIMG = imageLists.items[0];
+                  imgURL = await mainIMG.getDownloadURL();
+                } catch {}
+              }
+
+              let isValid = false;
+
+              if (
+                id &&
+                uid &&
+                title &&
+                timestamp &&
+                desc &&
+                displayName &&
+                likes !== undefined
+              ) {
+                isValid = true;
+              }
+              postsArray.push({
+                id,
+                uid,
+                displayName,
+                title,
+                desc,
+                imgURL,
+                likes,
+                timestamp,
+                isValid
+              });
+            };
+            try {
+              updateFeed();
+            } catch {
+              console.error('Too many requests!');
+            }
+          });
+          postsArray = postsArray.filter((post) => post.isValid);
+
+          setcurrentPosts(postsArray);
+        },
+        (_err) => {
+          router.push('/login');
+        }
+      );
+      return () => unsubscribe();
     } else {
+      router.push('/login');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) {
       router.push('/login');
     }
   }, [currentUser]);
@@ -134,7 +143,7 @@ export default function feed({ currentUser }: props) {
             <FormPostModal open={formPostOpen} setOpen={setformPostOpen} />
           )}
           <div>
-            <FeedPosts posts={currentPosts} fetchNew={fetchNewPosts} />
+            <FeedPosts posts={currentPosts} />
           </div>
           <AppBar position="fixed" style={{ top: 'auto', bottom: 0 }}>
             <Toolbar>

@@ -24,17 +24,12 @@ type postsArray = Array<post>;
 
 interface props {
   posts: postsArray;
-  fetchNew: Function;
 }
 
-export default function FeedPosts({ posts, fetchNew }: props) {
+export default function FeedPosts({ posts }: props) {
   return (
     <div style={{ display: 'flex', height: '75vh', padding: '25px' }}>
-      <InfiniteLoadingList
-        hasMoreItems={true}
-        itemHeight={150}
-        loadMoreItems={fetchNew}
-      >
+      <InfiniteLoadingList itemHeight={150}>
         {posts.map((post: post) => {
           return (
             <div key={post.id} className="center-all-div">
