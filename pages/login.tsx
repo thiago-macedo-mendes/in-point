@@ -80,7 +80,7 @@ export default function login({ currentUser }: props) {
               />
             </form>
           </Grid>
-          <Link href="/signup" className={styles.bottomLink}>
+          <Link onClick={router.push('/signup')} className={styles.bottomLink}>
             Não tem uma conta?
           </Link>
           {reqError && <WarnModal message={reqErrorMsg} />}
