@@ -23,10 +23,12 @@ interface post {
   id: string;
   uid: string;
   title: string;
+  desc: string;
   likes: Number;
   imgURL: string;
   timestamp: Date;
   isValid: Boolean;
+  displayName: string;
 }
 
 export default function feed({ currentUser }: props) {
@@ -39,47 +41,61 @@ export default function feed({ currentUser }: props) {
     setformPostOpen(true);
   };
 
-  const fetchNewPosts = async () => {
+  const fetchNewPosts = () => {
     const firestore = firebase.firestore();
     const storage = firebase.storage();
 
     const postsCollection = firestore.collection('POSTS');
-    const unsubscribe = postsCollection.onSnapshot((querySnapshot) => {
-      const postsArray: Array<post> = [];
+    postsCollection.onSnapshot((querySnapshot) => {
+      let postsArray: Array<post> = [];
       querySnapshot.docs.forEach((doc) => {
         const updateFeed = async () => {
           const post_data = doc.data();
 
           const { id } = doc;
-          const { uid, title, likes, timestamp } = post_data;
+          const { uid, title, desc, likes, displayName, timestamp } = post_data;
 
-          const imageLists = await storage.ref(`/POSTS/${id}/IMAGES`).list();
-          const mainIMG = imageLists.items[0];
-          const imgURL = await mainIMG.getDownloadURL();
+          let imgURL = 'null';
+
+          if (false) {
+            try {
+              const imageLists = await storage
+                .ref(`/POSTS/${id}/IMAGES`)
+                .list();
+              const mainIMG = imageLists.items[0];
+              imgURL = await mainIMG.getDownloadURL();
+            } catch {}
+          }
 
           let isValid = false;
-          if (id && uid && title && timestamp && likes !== undefined) {
+
+          if (
+            id &&
+            uid &&
+            title &&
+            timestamp &&
+            desc &&
+            displayName &&
+            likes !== undefined
+          ) {
             isValid = true;
           }
           postsArray.push({
             id,
             uid,
+            displayName,
             title,
+            desc,
             imgURL,
             likes,
             timestamp,
             isValid
           });
         };
-        try {
-          updateFeed();
-        } catch {}
+        updateFeed();
       });
-
-      if (postsArray) {
-        setcurrentPosts(postsArray);
-      }
-      unsubscribe();
+      postsArray = postsArray.filter((post) => post.isValid);
+      setcurrentPosts(postsArray);
     });
   };
 
@@ -93,28 +109,15 @@ export default function feed({ currentUser }: props) {
 
   return (
     <div>
-      {!currentUser ? (
+      {!currentUser || !currentPosts ? (
         <CenteredLoadingCircle />
       ) : (
         <Fragment>
           {formPostOpen && (
-            <Fragment>
-              <FormPostModal open={formPostOpen} setOpen={setformPostOpen} />
-            </Fragment>
+            <FormPostModal open={formPostOpen} setOpen={setformPostOpen} />
           )}
           <div>
-            {currentPosts ? (
-              <Fragment>
-                <FeedPosts
-                  posts={currentPosts}
-                  fetchNew={() => {
-                    console.log('UE');
-                  }}
-                />
-              </Fragment>
-            ) : (
-              <CenteredLoadingCircle />
-            )}
+            <FeedPosts posts={currentPosts} fetchNew={fetchNewPosts} />
           </div>
           <AppBar position="fixed" style={{ top: 'auto', bottom: 0 }}>
             <Toolbar>

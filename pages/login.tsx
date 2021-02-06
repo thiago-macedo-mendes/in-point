@@ -12,7 +12,6 @@ import styles from '../styles/authmain.module.css';
 
 import defaultConsts from '../utils/consts';
 import handleFirebaseError from '../utils/firebase/firebase_error_localizer';
-import { pushToFeedIfLoggedIn } from '../utils/pages/accessHandler';
 
 import firebase from 'firebase/app';
 import 'firebase/auth';

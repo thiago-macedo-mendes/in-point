@@ -16,18 +16,18 @@ const propTypes = {
 type componentProps = PropTypes.InferProps<typeof propTypes>;
 
 export default function WarnModal({ message }: componentProps) {
-  const [errorModalOpen, seterrorModalOpen] = useState(true);
+  const [warnModalOpen, setWarnModalOpen] = useState(true);
 
   const handleCloseErrorModal = () => {
-    seterrorModalOpen(false);
+    setWarnModalOpen(false);
   };
 
   return (
     <div>
-      {errorModalOpen && (
+      {warnModalOpen && (
         <Fragment>
           <Dialog
-            open={errorModalOpen}
+            open={warnModalOpen}
             onClose={handleCloseErrorModal}
             aria-labelledby="request-error-title"
             aria-describedby="request-error-description"

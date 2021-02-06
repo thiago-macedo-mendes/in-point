@@ -14,9 +14,11 @@ interface post {
   id: string;
   uid: string;
   title: string;
+  desc: string;
   likes: Number;
   imgURL: string;
   timestamp: Date;
+  displayName: string;
 }
 
 type postsArray = Array<post>;
@@ -27,12 +29,11 @@ interface props {
 }
 
 export default function FeedPosts({ posts, fetchNew }: props) {
-  console.log(posts)
   return (
-    <div style={{ display: 'flex', height: '100vh', padding: '25px' }}>
+    <div style={{ display: 'flex', height: '75vh', padding: '25px' }}>
       <InfiniteLoadingList
         hasMoreItems={true}
-        itemHeight={100}
+        itemHeight={150}
         loadMoreItems={fetchNew}
       >
         {posts.map((post: post) => {
@@ -40,7 +41,14 @@ export default function FeedPosts({ posts, fetchNew }: props) {
             <div key={post.id} className="center-all-div">
               <Card style={{ width: '75vw' }}>
                 <CardContent>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Typography variant="h6" style={{ alignSelf: 'end' }}>
+                      de: {post.displayName}
+                    </Typography>
+                  </div>
                   <Typography variant="h5">{post.title}</Typography>
+
+                  <Typography variant="body1">{post.desc}</Typography>
                 </CardContent>
               </Card>
             </div>

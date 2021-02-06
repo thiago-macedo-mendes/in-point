@@ -14,7 +14,7 @@ import CenteredLoadingCircle from '../components/misc/CenteredLoadingCircle';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
-import PropTypes from 'prop-types';
+import PropTypes, { number } from 'prop-types';
 
 const proptypes = {
   Component: PropTypes.func.isRequired,

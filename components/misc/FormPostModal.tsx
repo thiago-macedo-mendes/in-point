@@ -45,14 +45,14 @@ export default function FormModal({ open, setOpen }: componentProps) {
     const currentUser = firebase.auth().currentUser;
 
     if (currentUser) {
-      const uid = currentUser.uid;
+      const { uid, displayName } = currentUser;
       const timestamp = new Date();
       const likes = 0;
 
       firebase
         .firestore()
         .collection('POSTS')
-        .add({ uid, title, desc, timestamp, likes })
+        .add({ uid, displayName, title, desc, timestamp, likes })
         .then((docRef) => {
           let imgname = 'null';
           let toPut: Blob = new Blob(['null'], {
